@@ -3,5 +3,36 @@
 {% block title %}Hello PostController!{% endblock %}
 
 {% block body %}
-    
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+    <h2>list all data</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <td>ID</td>
+                <td>Title</td>
+                <td>Action</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for post in posts %}
+            <tr>
+                <td>{{ post.id }}</td>
+                <td>
+                    <a href="{{ path('post.show', {id: post.id}) }}">
+                        {{ post.title }}
+                    </a>
+                </td>
+                <td>
+                    <a class="text-danger" href="{{ path('post.delete', {id: post.id}) }}">
+                        Delete
+                    </a>                    
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
