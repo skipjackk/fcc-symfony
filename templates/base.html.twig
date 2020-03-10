@@ -21,6 +21,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ path('custom', {name: 'Hope'}) }}">New Hope</a>
                 </li>
+                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                    <li class="nav-item float-right">
+                        <a class="nav-link" href="{{ path('app_logout') }}">Logout</a>
+                    </li>
+                {% endif %}
             </ul>            
         </div>
     </nav>

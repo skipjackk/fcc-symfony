@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Post;
 use App\Form\PostType;
 use App\Repository\PostRepository;
+use App\Services\FileUploader;
+use App\Services\Notification;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,9 +34,10 @@ class PostController extends AbstractController
     /**
      * @Route("/create", name="create")
      * @param Request $request
+     * @param FileUploader $fileUploader
      * @return Response
      */
-    public function create(Request $request){
+    public function create(Request $request, FileUploader $fileUploader, Notification $notification){
         //create a new post with title
         $post = new Post();
 
@@ -44,11 +47,16 @@ class PostController extends AbstractController
         if($form->isSubmitted()){
             //entity manager
             $em = $this->getDoctrine()->getManager();
-            // $em->persist($post);
-            // $em->flush();
+            /** @var UploadedFile $file */
+            $file = $request->files->get('post')['attachment'];
+            if($file){
+                $filename = $fileUploader->uploadFile($file);
+                $post->setImage($filename);
+                $em->persist($post);
+                $em->flush();
+            }
+            return $this->redirect($this->generateUrl('post.index'));
         }
-
-        // $post->setTitle('This going to be a title');
 
         return $this->render('post/create.html.twig',[
             'form' => $form->createView()
@@ -61,7 +69,7 @@ class PostController extends AbstractController
      * @return Response
      */
     public function show(Post $post){
-
+        
         //create show view
         return $this->render('post/show.html.twig',[
             'post' => $post
